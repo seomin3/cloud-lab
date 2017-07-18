@@ -1,0 +1,46 @@
+---
+- hosts: kubeadm
+  become: yes
+  tasks:
+    - name: install docker
+      apt:
+        name: docker.io
+        update_cache: yes
+        cache_valid_time: 3600
+        state: present
+
+    - name: install relate package
+      apt:
+        name: apt-transport-https
+        state: present
+
+    - name: add google repository key
+      apt_key:
+        id: 87a05a37
+        url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+        state: present
+      ignore_errors: yes
+
+    - name: write to the source.d
+      copy:
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        content: 'deb http://apt.kubernetes.io/ kubernetes-xenial main'
+
+    - name: install k8s
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      with_items:
+      - kubelet
+      - kubeadm
+      - kubernetes-cni
+
+    - name: install mon-tools
+      apt:
+        name: "{{ item }}"
+        update_cache: no
+        cache_valid_time: 3600
+      with_items:
+        - htop
+        - dstat

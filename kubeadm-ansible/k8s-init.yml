@@ -1,0 +1,67 @@
+- hosts: kubeadm
+  vars:
+    k8s_stor_file: |
+      apiVersion: storage.k8s.io/v1beta1
+      kind: StorageClass
+      metadata:
+      namespace: kube-system
+      name: general
+      annotations:
+        storageclass.beta.kubernetes.io/is-default-class: "true"
+      provisioner: kubernetes.io/host-path
+  tasks:
+
+  - stat:
+      path: /etc/kubernetes/admin.conf
+    register: kubeadmin
+
+  - command: >
+      sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.21.2 --skip-preflight-checks --kubernetes-version stable-1.6
+    when: kubeadmin.stat.exists == false
+    register: result
+  - debug: var=result.stdout_lines
+    when: kubeadmin.stat.exists == false
+
+  - file:
+      dest: "{{ ansible_env.HOME }}/.kube/"
+      state: directory
+
+  - copy:
+      src: /etc/kubernetes/admin.conf
+      dest: "{{ ansible_env.HOME }}/.kube/config"
+      owner: "{{ ansible_user_uid }}"
+      group: "{{ ansible_user_gid }}"
+      remote_src: yes
+    become: yes
+
+  - lineinfile:
+      dest: "{{ ansible_env.HOME }}/.bashrc"
+      line: "KUBECONFIG=$HOME/admin.conf"
+
+  - shell: >
+      kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel-rbac.yml
+    register: result
+  - debug: var=result.stdout_lines
+
+  - shell: >
+      kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    register: result
+  - debug: var=result.stdout_lines
+
+  - shell: >
+      kubectl taint nodes --all node-role.kubernetes.io/master-
+    register: result
+  - debug: var=result.stdout_lines
+
+  - copy:
+      content: "{{ k8s_stor_file }}"
+      dest: "{{ ansible_env.HOME }}/general-storage-class.yaml"
+  - shell: >
+      kubectl create -f ~/general-storage-class.yaml
+    register: result
+  - debug: var=result.stdout_lines
+
+  - shell: >
+      kubectl get all --namespace=kube-system
+    register: result
+  - debug: var=result.stdout_lines

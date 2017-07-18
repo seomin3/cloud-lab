@@ -1,0 +1,12 @@
+---
+- hosts: kubeadm
+  tasks:
+  - shell: >
+      kubectl create -f https://git.io/kube-dashboard
+    register: result
+  - debug: var=result.stdout_lines
+
+  - shell: >
+      kubectl proxy
+    register: result
+  - debug: var=result.stdout_lines
