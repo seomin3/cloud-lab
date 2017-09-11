@@ -1,0 +1,27 @@
+{
+  "builders": [{
+    "type": "openstack",
+    "identity_endpoint": "http://192.168.61.11:5000/v3",
+    "tenant_name": "admin",
+    "domain_name": "Default",
+    "username": "sysop",
+    "password": "sysop",
+    "region": "RegionOne",
+    "ssh_username": "centos",
+    "ssh_keypair_name": "stack",
+    "ssh_private_key_file": "/home/sysop/keypair/so/sysop.txt",
+    "image_name": "CentOS-7-1707-custom",
+    "source_image": "c629e3f2-d849-4cba-8b8b-2a6e46d116e9",
+    "flavor": "m1.small",
+    "networks": "3c526423-4996-49a2-b473-6128ee6c3e6c"
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 3",
+        "sudo yum -y install libguestfs-tools ansible tcpdump"
+      ]
+    }
+  ]
+}

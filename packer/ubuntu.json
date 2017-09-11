@@ -1,0 +1,24 @@
+{
+  "builders": [{
+    "type": "openstack",
+    "identity_endpoint": "http://192.168.61.11:5000/v3",
+    "tenant_name": "admin",
+    "domain_name": "Default",
+    "username": "sysop",
+    "password": "sysop",
+    "region": "RegionOne",
+    "ssh_username": "ubuntu",
+    "ssh_keypair_name": "stack",
+    "ssh_private_key_file": "/home/sysop/keypair/so/sysop.txt",
+    "image_name": "k8s-test",
+    "source_image": "01f24d60-fbd2-4cf6-8a12-e04fda8a9fa4",
+    "flavor": "5",
+    "networks": "3c526423-4996-49a2-b473-6128ee6c3e6c"
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "ubuntu-script.sh"
+    }
+  ]
+}
