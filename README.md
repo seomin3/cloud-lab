@@ -1,2 +1,2 @@
-# container-lab
+# cloud-lab
 vagrant lab environment
