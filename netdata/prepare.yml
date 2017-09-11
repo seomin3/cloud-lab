@@ -1,0 +1,28 @@
+---
+
+- hosts: all
+  become: yes
+  vars:
+    args_yum_update: "no"
+  tasks:
+  - yum:
+      name: epel-release
+
+  - yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - htop
+      - dstat
+
+  - yum:
+      name: "*"
+      state: latest
+      disablerepo: "epel"
+    when: args_yum_update == "yes"
+
+  - command: curl -o netdata.sh https://my-netdata.io/kickstart.sh
+  - command: sudo bash -x netdata.sh --non-interactive
+
+  - command: echo 1 >/sys/kernel/mm/ksm/run
+  - command: echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
