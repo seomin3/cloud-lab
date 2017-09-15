@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Base VM OS configuration.
+  config.vm.box = "sysop/ubuntu1604"
+  config.ssh.username = "ubuntu"
+  config.ssh.insert_key = true
+
+  # General VirtualBox VM configuration.
+  config.vm.provider :virtualbox do |v|
+    v.memory = 1024 * 1
+    v.cpus = 2
+    v.linked_clone = true
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    v.customize ["modifyvm", :id, "--ioapic", "on"]
+  end
+
+  # vm
+  config.vm.define "docker" do |node|
+    node.vm.hostname = "docker"
+    node.vm.network :private_network, ip: "192.168.21.3"
+  end
+  
+  # provisioner
+  config.vm.provision "shell" do |node|
+    node.path = "run.sh"
+  end
+  
+end
