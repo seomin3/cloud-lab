@@ -3,8 +3,7 @@
 
 Vagrant.configure("2") do |config|
   # Base VM OS configuration.
-  #config.vm.box = "ubuntu/xenial64"
-  config.vm.box = "sysop/ubuntu"
+  config.vm.box = "sysop/ubuntu1604"
   config.ssh.username = "ubuntu"
   config.ssh.insert_key = true
 
@@ -17,16 +16,19 @@ Vagrant.configure("2") do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
-  # kubeadm
-  config.vm.define "kubeadm" do |kubeadm|
-    kubeadm.vm.hostname = "kubeadm"
-    kubeadm.vm.network :private_network, ip: "192.168.21.2"
+  # vm
+  config.vm.define "kubeadm" do |node|
+    node.vm.hostname = "k8s-cont"
+    node.vm.network :private_network, ip: "192.168.21.2"
   end
   
-  # ansible
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "main.yml"
-    #ansible.sudo = true
+  # provisioner
+  config.vm.provision "shell" do |node|
+    node.inline = "apt install -y -q python-minimal python2.7"
+  end
+  config.vm.provision "ansible" do |node|
+    node.playbook = "main.yml"
+    #node.sudo = true
   end
   
 end

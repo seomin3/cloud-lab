@@ -6,7 +6,7 @@
     register: result
   - debug: var=result.stdout_lines
 
-  - shell: >
-      kubectl proxy
-    register: result
-  - debug: var=result.stdout_lines
+#  - shell: >
+#      kubectl proxy
+#    register: result
+#  - debug: var=result.stdout_lines
