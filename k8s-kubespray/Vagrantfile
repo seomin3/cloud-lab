@@ -4,7 +4,7 @@
 Vagrant.configure("2") do |config|
   # Base VM OS configuration.
   config.vm.box = "sysop/ubuntu1604"
-  #config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '~/github/kubespray', '/kubespray', owner: 'ubuntu', group: 'ubuntu'
   config.ssh.username = "ubuntu"
   config.ssh.insert_key = true
   # network
@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
   config.hostmanager.enabled = true
   config.hostmanager.manage_guest = true
   config.hostmanager.ignore_private_ip = true
-  config.vbguest.auto_update = true
+  config.vbguest.auto_update = false
 
   # General VirtualBox VM configuration.
   config.vm.provider :virtualbox do |v|
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "kube-master" do |node|
     node.vm.hostname = "kube-master"
     node.vm.provider :virtualbox do |v|
-      v.customize ["modifyvm", :id, "--memory", 4096]
+      v.customize ["modifyvm", :id, "--memory", 3072]
       v.customize ["modifyvm", :id, "--cpus", 2]
     end
     node.vm.provision "shell", :path => 'setup.sh', :args => 'master'
